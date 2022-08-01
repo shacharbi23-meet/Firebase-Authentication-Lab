@@ -19,22 +19,32 @@ def signin():
     return render_template("signin.html")
 
 
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
         try:
+            email = request.form['email']
+            password = request.form['password']
             login_session['user'] = auth.create_user_with_email_and_password(email, password)
-            user_info = {"Name":request.form['fullname']}
+            user= {"Name":request.form['fullname'], "Usename": request.form['username'], "Bio": request.form['bio']}
+            db.child("Users").child(login_session['user']['localId']).set(user)
             return redirect(url_for('add_tweet'))
         except:
             print("Error, identification failed. Please try again.")
     return render_template("signup.html")
 
 
+
 @app.route('/add_tweet', methods=['GET', 'POST'])
 def add_tweet():
+    if request.method == 'POST':
+        try:
+            tweet = {"Title": request.form['title'], "Text": request.form['text'], "UID":  login_session["user"]["localId"]}
+            db.child("Tweets").push(tweet)
+            return redirect(url_for('all_tweets'))
+        except:
+            print("Error, couldn't make a post.")
     return render_template("add_tweet.html")
 
 @app.route('/signout')
@@ -44,6 +54,9 @@ def signout():
     return redirect(url_for('signin'))
 
 
+@app.route('/all_tweets', methods = ['GET', 'POST'])
+def all_tweets():
+    return render_template('tweets.html', tweets = db.child('Tweets').get().val())
 
 config = {"apiKey": "AIzaSyCAUIlBaXwTW5VuAsfEKBH-Iq6rBfxS_Rc",
 "authDomain": "a-demo-96540.firebaseapp.com",
