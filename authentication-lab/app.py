@@ -26,6 +26,7 @@ def signup():
         password = request.form['password']
         try:
             login_session['user'] = auth.create_user_with_email_and_password(email, password)
+            user_info = {"Name":request.form['fullname']}
             return redirect(url_for('add_tweet'))
         except:
             print("Error, identification failed. Please try again.")
@@ -51,10 +52,11 @@ config = {"apiKey": "AIzaSyCAUIlBaXwTW5VuAsfEKBH-Iq6rBfxS_Rc",
 "messagingSenderId": "604078986811",
 "appId": "1:604078986811:web:1f1d1d1dc26109e2c16e1e",
 "measurementId": "G-DF593TBGXY",
-"databaseURL": ""}
+"databaseURL": "https://a-demo-96540-default-rtdb.europe-west1.firebasedatabase.app/"}
 
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
+db = firebase.database()
 
 
 
